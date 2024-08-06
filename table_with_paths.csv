@@ -1,0 +1,3 @@
+sample_name,image_path,spaceranger_path
+section_1,/path/to/image1.ndpi,/path/to/spaceranger_out1
+section_2,/path/to/image2.tif,/path/to/spaceranger_out2
