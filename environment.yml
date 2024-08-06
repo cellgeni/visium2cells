@@ -27,4 +27,11 @@ dependencies:
   - tzdata=2024a=h0c530f3_0
   - wheel=0.44.0=pyhd8ed1ab_0
   - xz=5.2.6=h166bdaf_0
+  - pip:
+      - certifi==2024.7.4
+      - charset-normalizer==3.3.2
+      - idna==3.7
+      - packaging==24.1
+      - requests==2.32.3
+      - tqdm==4.66.5
 prefix: /software/cellgen/team278/sm57/envs/stardist
