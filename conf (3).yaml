@@ -1,0 +1,6 @@
+table_with_paths: table_with_paths.csv
+output_folder: /path/to/out/folder
+background_threshold_intensity: 200
+save_h5ad: True
+save_csv: True
+skip_failed: True
