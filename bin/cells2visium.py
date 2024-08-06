@@ -91,7 +91,12 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
 
 
 def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh = 200, save_csv = True, save_h5ad = False):
-    
+    ## img_path [string] - path to the image (can read tif and ndpi images)
+    ## spaceranger_path [string] - path to the spaceranger output folder
+    ## sample_name [string] - for identification of the sample 
+    ## background_thresh [0-255] - define image thresholding to define "occupacy_tissue" parameter
+    ## save_csv [boolean] - whether save output as csv or not
+    ## save_h5ad [boolean] - whether save output as anndata h5ad file with additional columns in adata.obs
     #if there is a new line symbol - remove it
     if '\n' in spaceranger_path:
         spaceranger_path = spaceranger_path.replace('\n', '')
