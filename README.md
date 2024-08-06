@@ -9,6 +9,7 @@ Also, you will need to prepare configuration file (see **conf.yaml**)
 To run single sample:
 
 `python cells2visium.py /path/to/img path/to/spaceranger/folder path/to/output/folder`
+
 you can also add flags:
  - background_thresh [0-255] - intensity in R and B channels, below which pixels will be assigned to tissue (only for "occupancy_tissue" parameter)
  - save_csv [boolean] - whether to save result as csv file or not
@@ -17,6 +18,7 @@ you can also add flags:
 To run batch of samples (sequentially, no parallelisation is used):
 
 `python cells2visium_batch.py conf.yaml`
+
 Make sure to fill configuration file as well as csv table which is points to
 
 ## Notes
