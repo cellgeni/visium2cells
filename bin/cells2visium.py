@@ -110,9 +110,6 @@ def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh 
     spot_radius = adata.uns['spatial'][sample_name_id]['scalefactors']['spot_diameter_fullres']//2
     yxs = adata.obsm['spatial']
     
-    print(img.shape)
-    print(np.max(yxs[:,0]))
-    print(np.max(yxs[:,1]))
     assert np.max(yxs[:,0])<img.shape[1] and np.max(yxs[:,1])<img.shape[0], 'Visium spot positions are out of the image - please check paths for spaceranger outputs and corresponding image'    
     
     
