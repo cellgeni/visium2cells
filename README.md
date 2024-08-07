@@ -28,6 +28,6 @@ To run batch of samples (sequentially, no parallelisation is used):
 Make sure to fill configuration file as well as csv table which is points to
 
 ## Notes
-- processing of one sample requires quite a lot of memory - I usaully ask for 200-300 Gb
+- processing of one sample requires quite a lot of memory - I usaully ask for 300-400 Gb
 - in case of working with batch of files, I suggest firstly to use flag *skip_failed_samples: True*, then all failed samples will not stop the whole process, and you will have an utput txt with the list of failed samples
 
