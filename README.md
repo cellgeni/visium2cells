@@ -8,6 +8,10 @@ In case you want to run a batch of the samples you will need to save this inform
 Also, you will need to prepare configuration file (see **conf.yaml**)
 
 ## Running
+Activate conda environment
+
+`conda activate stardist`
+
 To run single sample:
 
 `python cells2visium.py /path/to/img path/to/spaceranger/folder path/to/output/folder`
