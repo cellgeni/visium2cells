@@ -1,8 +1,9 @@
 ## Preparation
-Upload whole folder. Create conda environment using environment yaml file:
+Upload whole folder. Create conda environment using **environment.yaml** file:
 
 `conda env create -f environment.yml`
 
+Alternatively you an use **requirements.txt** to create python environment.
 For each dataset you will need to prepare: (i) it's name, (ii) path to the full resolution H&E image and (iii) path to the spaceranger output folder. It is important that image was the same as used in spacerranger analysis.
 In case you want to run a batch of the samples you will need to save this information for all samples in csv file with the same column names as in **table_with_paths.csv**
 Also, you will need to prepare configuration file (see **conf.yaml**)
