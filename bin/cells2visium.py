@@ -1,4 +1,5 @@
 import numpy as np
+#import matplotlib.pyplot as plt
 import tifffile as tf
 from csbdeep.utils import normalize
 from stardist.models import StarDist2D
@@ -57,10 +58,10 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
     R,G,B = np.sum(img[cc, rr][non_bg_mask], axis=0)
     if n_cell>0:
         #here I look for additional cells par-s
-        segm_prob = np.mean(poly_fluo['prob'][ids])
+        segm_prob = np.mean(poly_fluo['prob'][ids-1])
         area_list = []; elongation_list = []
         for id_i in ids:
-            x_contour = poly_fluo['coord'][id_i,0,:]; y_contour = poly_fluo['coord'][id_i,1,:]
+            x_contour = poly_fluo['coord'][id_i-1,0,:]; y_contour = poly_fluo['coord'][id_i-1,1,:]
             ar, el = define_area_aspect_ratio_ellipse(x_contour, y_contour)
             area_list.append(ar); 
             if np.isnan(el)==False:
@@ -91,12 +92,7 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
 
 
 def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh = 200, save_csv = True, save_h5ad = False):
-    ## img_path [string] - path to the image (can read tif and ndpi images)
-    ## spaceranger_path [string] - path to the spaceranger output folder
-    ## sample_name [string] - for identification of the sample 
-    ## background_thresh [0-255] - define image thresholding to define "occupacy_tissue" parameter
-    ## save_csv [boolean] - whether save output as csv or not
-    ## save_h5ad [boolean] - whether save output as anndata h5ad file with additional columns in adata.obs
+    
     #if there is a new line symbol - remove it
     if '\n' in spaceranger_path:
         spaceranger_path = spaceranger_path.replace('\n', '')
@@ -110,32 +106,31 @@ def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh 
     spot_radius = adata.uns['spatial'][sample_name_id]['scalefactors']['spot_diameter_fullres']//2
     yxs = adata.obsm['spatial']
     
+    
     assert np.max(yxs[:,0])<img.shape[1] and np.max(yxs[:,1])<img.shape[0], 'Visium spot positions are out of the image - please check paths for spaceranger outputs and corresponding image'    
     
     
     label_fluo, poly_fluo = segmentation(img)
     #tf.imwrite(out_folder + '/img_label_' + str(i) +'.tif', label_fluo) 
-
-
     
-    print('yxs')
+    
+    #print('yxs')
     mask_img = (img[:,:,0] > background_thresh) & (img[:,:,2] > background_thresh)
-    print('mask_img')
+    #print('mask_img')
     metrics = []
     for j, yx in enumerate(yxs):  
         n_cell, occupancy, R, G, B, area, elongation, segm_prob, occupancy_tissue = one_visium_spot_analysis(yx,  spot_radius, label_fluo, poly_fluo, mask_img, img)
+        #print([yx[0], yx[1], n_cell, occupancy, R, G, B, area, segm_prob, elongation, occupancy_tissue])
         metrics.append([yx[0], yx[1], n_cell, occupancy, R, G, B, area, segm_prob, elongation, occupancy_tissue])
 
     metrics_df = pd.DataFrame(metrics, columns=['y', 'x', 'n_cell', 'occupancy', 'R', 'G', 'B', 'area_cell_px', 'seg_prob', 'elongation', 'occupancy_tissue'], index=adata.obs.index)
-
+    
     #save results
     if save_csv:
         full_path_csv = out_folder + '/' + sample_name + '.csv'
         metrics_df.to_csv(full_path_csv)
     
     if save_h5ad:
-        print(adata.obs.shape)
-        print(metrics_df.shape)
         full_path_h5ad = out_folder + '/' + sample_name + '.h5ad'
         adata.obs = pd.concat([adata.obs, metrics_df], axis=1, ignore_index=False)
         adata.write_h5ad(full_path_h5ad)
