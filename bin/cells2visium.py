@@ -48,6 +48,7 @@ def define_area_aspect_ratio_ellipse(x,y):
     return area, elongation
 
 def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, img):
+    yx = np.array([int(yx[0]), int(yx[1])])
     rr, cc = disk(yx, spot_radius)
     vals = label_fluo[cc, rr]
     ids0, counts = np.unique(vals, return_counts=True) #ids are actually cell ids which are sitting on top of visium spot
