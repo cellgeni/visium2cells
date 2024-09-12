@@ -11,7 +11,7 @@ Also, you will need to prepare configuration file (see **conf.yaml**)
 ## Running
 Activate conda environment
 
-`conda activate stardist`
+`conda activate visium_segmentation`
 
 To run single sample:
 
