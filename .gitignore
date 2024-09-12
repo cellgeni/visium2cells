@@ -1,1 +1,9 @@
-dist
+__pycache__/
+build/
+dist/
+wheels/
+.cache/
+.env/
+.idea/
+.vscode/
+.DS_Store
