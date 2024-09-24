@@ -15,10 +15,10 @@ warnings.filterwarnings("ignore")
 
 
 
-def segmentation(img, prob_thresh=0.3, nms_thresh=0.4):
+def segmentation(img, prob_thresh=0.3, nms_thresh=0.4, pmin=3, pmax = 99.8):
     model = StarDist2D.from_pretrained('2D_versatile_he')
 
-    normalised = normalize(img)
+    normalised = normalize(img, pmin, pmax)
     label_fluo, poly_fluo = model.predict_instances(
         normalised,
         # crop,
@@ -92,7 +92,7 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
 
 
 
-def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh = 200, save_csv = True, save_h5ad = False):
+def main(img_path, spaceranger_path, sample_name, out_folder, prob_thresh=0.3, nms_thresh=0.4, pmin=3, pmax = 99.8, background_thresh = 200, save_csv = True, save_h5ad = False):
     
     #if there is a new line symbol - remove it
     if '\n' in spaceranger_path:
@@ -111,7 +111,7 @@ def main(img_path, spaceranger_path, sample_name, out_folder, background_thresh 
     assert np.max(yxs[:,0])<img.shape[1] and np.max(yxs[:,1])<img.shape[0], 'Visium spot positions are out of the image - please check paths for spaceranger outputs and corresponding image'    
     
     
-    label_fluo, poly_fluo = segmentation(img)
+    label_fluo, poly_fluo = segmentation(img, prob_thresh, nms_thresh, pmin, pmax)
     #tf.imwrite(out_folder + '/img_label_' + str(i) +'.tif', label_fluo) 
     
     
