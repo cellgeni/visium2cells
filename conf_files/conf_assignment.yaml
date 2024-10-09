@@ -1,0 +1,6 @@
+path_adata: /lustre/scratch126/cellgen/team283/yd2/whole_embryo/17092024_CS16_transformation_matrix/CS16_Moscot_alpha_03_reference_029.h5ad
+path_tmat_json: /lustre/scratch127/cellgen/cellgeni/tickets/tic-3337/CS16/aligned_downsampled_2_reg.json
+downscale: 2
+out_file_path: /lustre/scratch127/cellgen/cellgeni/tickets/tic-3337/postregistration/anndata_CS16_code.h5ad
+center_image_x: 15000
+center_image_y: 15000
