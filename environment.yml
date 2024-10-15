@@ -1,138 +1,174 @@
-name: visium_segmentation
+name: visium_segm
 channels:
   - defaults
-  - conda-forge
-  - nvidia
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
-  - ca-certificates=2024.7.2=h06a4308_0
-  - certifi=2022.12.7=py37h06a4308_0
-  - ld_impl_linux-64=2.38=h1181459_1
-  - libffi=3.3=he6710b0_2
+  - bzip2=1.0.8=h5eee18b_6
+  - ca-certificates=2024.9.24=h06a4308_0
+  - ld_impl_linux-64=2.40=h12ee557_0
+  - libffi=3.4.4=h6a678d5_1
   - libgcc-ng=11.2.0=h1234567_1
   - libgomp=11.2.0=h1234567_1
   - libstdcxx-ng=11.2.0=h1234567_1
+  - libuuid=1.41.5=h5eee18b_0
   - ncurses=6.4=h6a678d5_0
-  - openssl=1.1.1w=h7f8727e_0
-  - pip=22.3.1=py37h06a4308_0
-  - python=3.7.15=haa1d7c7_0
+  - openssl=3.0.15=h5eee18b_0
+  - pip=24.2=py311h06a4308_0
+  - python=3.11.10=he870216_0
   - readline=8.2=h5eee18b_0
-  - setuptools=65.6.3=py37h06a4308_0
+  - setuptools=75.1.0=py311h06a4308_0
   - sqlite=3.45.3=h5eee18b_0
   - tk=8.6.14=h39e8969_0
-  - wheel=0.37.1=pyhd3eb1b0_0
+  - wheel=0.44.0=py311h06a4308_0
   - xz=5.4.6=h5eee18b_1
   - zlib=1.2.13=h5eee18b_1
   - pip:
       - absl-py==2.1.0
-      - aiohttp==3.8.6
+      - aiobotocore==2.5.4
+      - aiohappyeyeballs==2.4.3
+      - aiohttp==3.10.10
+      - aioitertools==0.12.0
       - aiosignal==1.3.1
-      - anndata==0.8.0
+      - anndata==0.10.9
+      - array-api-compat==1.9
       - asciitree==0.3.3
       - astunparse==1.6.3
-      - async-timeout==4.0.3
-      - asynctest==0.13.0
       - attrs==24.2.0
-      - cachetools==5.4.0
-      - charset-normalizer==3.3.2
-      - cloudpickle==2.2.1
-      - csbdeep==0.8.0
-      - cycler==0.11.0
-      - dask==2022.2.0
-      - dask-image==2022.9.0
-      - decorator==5.1.1
+      - botocore==1.31.17
+      - certifi==2024.8.30
+      - charset-normalizer==3.4.0
+      - click==8.1.7
+      - cloudpickle==3.0.0
+      - colorcet==3.1.0
+      - contourpy==1.3.0
+      - csbdeep==0.8.1
+      - cycler==0.12.1
+      - dask==2024.9.1
+      - dask-expr==1.1.15
+      - dask-image==2024.5.3
+      - datashader==0.16.3
+      - distributed==2024.9.1
       - docrep==0.3.2
-      - entrypoints==0.4
       - fasteners==0.19
-      - fire==0.6.0
+      - fire==0.7.0
       - flatbuffers==24.3.25
-      - fonttools==4.38.0
-      - frozenlist==1.3.3
-      - fsspec==2023.1.0
-      - gast==0.4.0
-      - google-auth==2.32.0
-      - google-auth-oauthlib==0.4.6
+      - fonttools==4.54.1
+      - frozenlist==1.4.1
+      - fsspec==2023.6.0
+      - gast==0.6.0
+      - geopandas==1.0.1
       - google-pasta==0.2.0
-      - grpcio==1.62.2
-      - h5py==3.8.0
-      - idna==3.7
-      - igraph==0.10.8
-      - imagecodecs==2021.11.20
-      - imageio==2.31.2
-      - importlib-metadata==6.7.0
-      - inflect==6.0.5
-      - joblib==1.3.2
-      - keras==2.11.0
-      - kiwisolver==1.4.5
+      - grpcio==1.66.2
+      - h5py==3.12.1
+      - idna==3.10
+      - igraph==0.11.6
+      - imagecodecs==2024.9.22
+      - imageio==2.35.1
+      - importlib-metadata==8.5.0
+      - inflect==7.4.0
+      - jinja2==3.1.4
+      - jmespath==1.0.1
+      - joblib==1.4.2
+      - json5==0.9.25
+      - keras==3.6.0
+      - kiwisolver==1.4.7
+      - lazy-loader==0.4
+      - legacy-api-wrap==1.4
       - leidenalg==0.10.2
       - libclang==18.1.1
-      - llvmlite==0.39.1
+      - llvmlite==0.43.0
       - locket==1.0.0
-      - markdown==3.4.4
-      - markupsafe==2.1.5
-      - matplotlib==3.5.3
+      - markdown==3.7
+      - markdown-it-py==3.0.0
+      - markupsafe==3.0.1
+      - matplotlib==3.9.2
       - matplotlib-scalebar==0.8.1
-      - multidict==6.0.5
+      - mdurl==0.1.2
+      - ml-dtypes==0.4.1
+      - more-itertools==10.5.0
+      - msgpack==1.1.0
+      - multidict==6.1.0
+      - multipledispatch==1.0.0
+      - multiscale-spatial-image==1.0.1
+      - namex==0.0.8
       - natsort==8.4.0
-      - networkx==2.6.3
-      - numba==0.56.4
-      - numcodecs==0.10.2
-      - numpy==1.21.6
-      - oauthlib==3.2.2
+      - networkx==3.4
+      - numba==0.60.0
+      - numcodecs==0.13.1
+      - numpy==1.26.4
+      - ome-zarr==0.9.0
       - omnipath==1.0.8
-      - opt-einsum==3.3.0
-      - packaging==24.0
-      - pandas==1.3.5
-      - partd==1.4.1
+      - opt-einsum==3.4.0
+      - optree==0.13.0
+      - packaging==24.1
+      - pandas==2.2.3
+      - param==2.1.1
+      - partd==1.4.2
       - patsy==0.5.6
-      - pillow==9.5.0
+      - pillow==10.4.0
       - pims==0.7
-      - protobuf==3.19.6
-      - pyasn1==0.5.1
-      - pyasn1-modules==0.3.0
-      - pydantic==1.10.18
+      - platformdirs==4.3.6
+      - pooch==1.8.2
+      - propcache==0.2.0
+      - protobuf==4.25.5
+      - psutil==6.0.0
+      - pyarrow==17.0.0
+      - pyct==0.5.0
+      - pygments==2.18.0
       - pynndescent==0.5.13
-      - pyparsing==3.1.2
+      - pyogrio==0.10.0
+      - pyparsing==3.1.4
+      - pyproj==3.7.0
       - python-dateutil==2.9.0.post0
-      - pytz==2024.1
-      - pywavelets==1.3.0
-      - pyyaml==6.0.1
-      - requests==2.31.0
-      - requests-oauthlib==2.0.0
-      - rsa==4.9
-      - scanpy==1.9.3
-      - scikit-image==0.19.3
-      - scikit-learn==1.0.2
-      - scipy==1.7.3
-      - seaborn==0.12.2
+      - pytz==2024.2
+      - pyyaml==6.0.2
+      - requests==2.32.3
+      - rich==13.9.2
+      - s3fs==2023.6.0
+      - scanpy==1.10.3
+      - scikit-image==0.24.0
+      - scikit-learn==1.5.2
+      - scipy==1.14.1
+      - seaborn==0.13.2
       - session-info==1.0.0
+      - shapely==2.0.6
       - six==1.16.0
       - slicerator==1.1.0
-      - squidpy==1.2.2
+      - sortedcontainers==2.4.0
+      - spatial-image==1.1.0
+      - spatialdata==0.2.3
+      - squidpy==1.6.1
       - stardist==0.9.1
-      - statsmodels==0.13.5
+      - statsmodels==0.14.4
       - stdlib-list==0.10.0
-      - tensorboard==2.11.2
-      - tensorboard-data-server==0.6.1
-      - tensorboard-plugin-wit==1.8.1
-      - tensorflow==2.11.0
-      - tensorflow-estimator==2.11.0
-      - tensorflow-io-gcs-filesystem==0.34.0
-      - termcolor==2.3.0
+      - tblib==3.0.0
+      - tensorboard==2.17.1
+      - tensorboard-data-server==0.7.2
+      - tensorflow==2.17.0
+      - tensorflow-io-gcs-filesystem==0.37.1
+      - termcolor==2.5.0
       - texttable==1.7.0
-      - threadpoolctl==3.1.0
-      - tifffile==2021.11.2
-      - toolz==0.12.1
-      - tqdm==4.66.4
-      - typing-extensions==4.7.1
+      - threadpoolctl==3.5.0
+      - tifffile==2024.9.20
+      - toolz==1.0.0
+      - tornado==6.4.1
+      - tqdm==4.66.5
+      - typeguard==4.3.0
+      - typing-extensions==4.12.2
+      - tzdata==2024.2
       - umap-learn==0.5.6
-      - urllib3==2.0.7
-      - validators==0.20.0
-      - werkzeug==2.2.3
+      - urllib3==1.26.20
+      - validators==0.34.0
+      - werkzeug==3.0.4
       - wrapt==1.16.0
-      - xarray==0.20.2
-      - yarl==1.9.4
-      - zarr==2.12.0
-      - zipp==3.15.0
-prefix: /software/cellgen/team278/sm57/envs/visium_segmentation
+      - xarray==2024.9.0
+      - xarray-dataclasses==1.8.0
+      - xarray-datatree==0.0.14
+      - xarray-schema==0.0.3
+      - xarray-spatial==0.4.0
+      - yarl==1.14.0
+      - zarr==2.18.3
+      - zict==3.0.0
+      - zipp==3.20.2
+prefix: /home/ubuntu/anaconda3/envs/visium_segm
