@@ -23,10 +23,11 @@ you can also add flags:
  - *save_h5ad* [boolean] - whether to save anndata from spaceranger output with additional folder (both flags can be *True*)
  - *prob_thresh* - probability threshold defined for segmentation (segmented cells with detection probability less than this value will be filtered out)
  - *nms_thresh* - overlapping threshold. Higher value will lead for larger area fraction of neighbouring segmented cells being overlapped
- - *pmin* - min boundary of percentile-based image normalisation *pmin*=[0,1] (everything below this value will be 0)
+ - *pmin* - min boundary of percentile-based image normalisation *pmin*=[0,1] (everything below this value will be 0). Image normalisation is happening just before segmentation
  - *pmax* - max boundary of percentile-based image normalisation *pmax*=[0,1]>*pmin* (everything above this value will be 1)
  - *scale_factor* - a multiplier to be used for spot position and sizes. SHould be used if spot positions were defined in image with different resolution to the image you use.
  - *save_segm_polygons* - save segmented polygons in json format. the json file will be saved as dictionary with fields `['coord']` (actual corrdinates of polygons), `['points']` (center positions of each cell/polygon), and `['prob']` (detection probability for each cell)
+ - *save_normalised_img* - save normalised image
 To run batch of samples (sequentially, no parallelisation is used):
 
 `python cells2visium_batch.py conf.yaml`
