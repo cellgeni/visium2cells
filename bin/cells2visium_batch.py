@@ -9,14 +9,21 @@ def ReadConfFile(FilePath):
     csv_file_path = data['table_with_paths']
     out_folder = data['output_folder']
     background_thresh = data['background_threshold_intensity']
-    skip_failed = data['skip_failed_samples']
+    skip_failed = data['skip_failed_samples']#
+    prob_thresh = data['segmentation_prob_thresh']
+    nms_thresh = data['segmentation_nms_thresh']
+    pmin = data['norm_pmin']
+    pmax = data['norm_pmax']
+    scale_factor = data['scale_factor']
     save_h5ad = data['save_h5ad']
     save_csv = data['save_csv']
-    return csv_file_path, out_folder, background_thresh, save_csv, save_h5ad, skip_failed
+    save_polygons = data['save_segmentation_polygons']
+    save_norm_img = data['save_normalised_image']
+    return csv_file_path, out_folder, background_thresh, save_csv, save_h5ad, skip_failed, prob_thresh, nms_thresh, pmin, pmax, scale_factor, save_polygons, save_norm_img
 
 
 def main(ConfFilePath):
-    csv_file_path, out_folder, background_thresh, save_csv, save_h5ad, skip_failed = ReadConfFile(ConfFilePath)
+    csv_file_path, out_folder, background_thresh, save_csv, save_h5ad, skip_failed, prob_thresh, nms_thresh, pmin, pmax, scale_factor, save_polygons, save_norm_img = ReadConfFile(ConfFilePath)
     csv_table = pd.read_csv(csv_file_path)
     list_of_failed_sections = []
     for i in range(csv_table.shape[0]):
@@ -28,12 +35,12 @@ def main(ConfFilePath):
         
         if skip_failed:
             try:
-                C2V(img_path, spaceranger_path, sample_name, out_folder, background_thresh = background_thresh, save_csv = save_csv, save_h5ad = save_h5ad)
+                C2V(img_path, spaceranger_path, sample_name, out_folder, background_thresh = background_thresh, save_csv = save_csv, save_h5ad = save_h5ad, prob_thresh = prob_thresh, nms_thresh = nms_thresh, pmin = pmin, pmax = pmax, scale_factor = scale_factor, save_segm_polygons = save_polygons, save_normalised_img = save_norm_img)
             except:
                 list_of_failed_sections.append(sample_name)
                 
         else:
-            C2V(img_path, spaceranger_path, sample_name, out_folder, background_thresh = background_thresh, save_csv = save_csv, save_h5ad = save_h5ad)
+            C2V(img_path, spaceranger_path, sample_name, out_folder, background_thresh = background_thresh, save_csv = save_csv, save_h5ad = save_h5ad, prob_thresh = prob_thresh, nms_thresh = nms_thresh, pmin = pmin, pmax = pmax, scale_factor = scale_factor, save_segm_polygons = save_polygons, save_normalised_img = save_norm_img)
     
     if len(list_of_failed_sections)>0:
         txt_path = out_folder + '/failed_samples.txt'
