@@ -1,5 +1,4 @@
 import numpy as np
-#import matplotlib.pyplot as plt
 import tifffile as tf
 from csbdeep.utils import normalize
 from stardist.models import StarDist2D
@@ -12,23 +11,21 @@ import warnings
 import squidpy as sq
 from skimage.measure import grid_points_in_poly
 warnings.filterwarnings("ignore")
-
-
-
+import json
+import os
+import gzip
+import numpy as np
 def segmentation(img, prob_thresh=0.3, nms_thresh=0.4, pmin=3, pmax = 99.8):
     model = StarDist2D.from_pretrained('2D_versatile_he')
 
     normalised = normalize(img, pmin, pmax)
     label_fluo, poly_fluo = model.predict_instances(
         normalised,
-        # crop,
-        # normalize(img),
-        # crop,
         n_tiles=(10, 10, 1),
         prob_thresh=prob_thresh,
         nms_thresh=nms_thresh,
     )
-    return label_fluo, poly_fluo
+    return label_fluo, poly_fluo, normalised
     
     
 def define_area_aspect_ratio_ellipse(x,y):
@@ -47,9 +44,9 @@ def define_area_aspect_ratio_ellipse(x,y):
     area = np.sum(inside)
     return area, elongation
 
-def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, img):
-    yx = np.array([int(yx[0]), int(yx[1])])
-    rr, cc = disk(yx, spot_radius)
+def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, img, scale_factor):
+    yx = np.array([int(yx[0]), int(yx[1])])*scale_factor
+    rr, cc = disk(yx, spot_radius*scale_factor)
     vals = label_fluo[cc, rr]
     ids0, counts = np.unique(vals, return_counts=True) #ids are actually cell ids which are sitting on top of visium spot
     ids = ids0[ids0 != 0]
@@ -67,10 +64,7 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
             area_list.append(ar); 
             if np.isnan(el)==False:
                 elongation_list.append(el)
-        #area_list = np.array(area_list[~np.isnan(area_list)])
-        #elongation_list = np.array(elongation_list[~np.isnan(elongation_list)])
-        #print(area_list)
-        #print(elongation_list)
+                
         if len(area_list)>0:
             area = np.mean(np.array(area_list))
         else:
@@ -90,9 +84,43 @@ def one_visium_spot_analysis(yx, spot_radius, label_fluo, poly_fluo, mask_img, i
     return n_cell, occupancy, R, G, B, area, elongation, segm_prob, occupancy_tissue
     
 
+def save_segmentation_features(adata, sample_name_id, img, background_thresh, label_fluo, poly_fluo, scale_factor):
+    spot_radius = adata.uns['spatial'][sample_name_id]['scalefactors']['spot_diameter_fullres']//2
+    yxs = adata.obsm['spatial']
+    assert np.max(yxs[:,0]*scale_factor)<img.shape[1] and np.max(yxs[:,1]*scale_factor)<img.shape[0], 'Visium spot positions are out of the image - please check paths for spaceranger outputs and corresponding image'  
+    mask_img = (img[:,:,0] > background_thresh) & (img[:,:,2] > background_thresh)
+    metrics = []
+    for j, yx in enumerate(yxs):  
+        n_cell, occupancy, R, G, B, area, elongation, segm_prob, occupancy_tissue = one_visium_spot_analysis(yx,  spot_radius, label_fluo, poly_fluo, mask_img, img, scale_factor)
+        metrics.append([yx[0], yx[1], n_cell, occupancy, R, G, B, area, segm_prob, elongation, occupancy_tissue])
+    metrics_df = pd.DataFrame(metrics, columns=['y', 'x', 'n_cell', 'occupancy', 'R', 'G', 'B', 'area_cell_px', 'seg_prob', 'elongation', 'occupancy_tissue'], index=adata.obs.index)
+    return metrics_df
 
+def save_segmentation_polygons_to_json(poly_dict, sample_name_id, out_folder):
+    poly_fluo2 = poly_dict.copy()
+    poly_fluo2['coord'] = poly_fluo2['coord'].tolist()
+    poly_fluo2['points'] = poly_fluo2['points'].tolist()
+    poly_fluo2['prob'] = poly_fluo2['prob'].tolist()
+    filepath = os.path.join(out_folder, sample_name_id +'.json')
+    with open(filepath, 'w') as f:
+        json.dump(poly_fluo2, f)
 
-def main(img_path, spaceranger_path, sample_name, out_folder, prob_thresh=0.3, nms_thresh=0.4, pmin=3, pmax = 99.8, background_thresh = 200, save_csv = True, save_h5ad = False):
+def save_norm_image_as_compr_npy(img, sample_name, out_folder):
+    filepath = os.path.join(out_folder, sample_name +'_norm_image.npy.gz')
+    f = gzip.GzipFile(filepath, "w")
+    np.save(file=f, arr=img)
+    f.close()
+    
+def save_norm_image_as_compr_tif(normalised, sample_name, out_folder):
+    norm_img2 = normalised*255
+    norm_img2[norm_img2<0] = 0
+    norm_img2[norm_img2>255] = 255
+    norm_img2 = norm_img2.astype('uint8')
+    print(norm_img2.shape)
+    filepath = os.path.join(out_folder, sample_name +'_norm_image.tif')
+    tf.imwrite(filepath, norm_img2, imagej=True, compression ='jpeg')
+    
+def main(img_path, spaceranger_path, sample_name, out_folder, prob_thresh=0.3, nms_thresh=0.4, pmin=3, pmax = 99.8, scale_factor = 1, background_thresh = 200, save_csv = False, save_h5ad = False, save_segm_polygons = True, save_normalised_img = True):
     
     #if there is a new line symbol - remove it
     if '\n' in spaceranger_path:
@@ -104,37 +132,31 @@ def main(img_path, spaceranger_path, sample_name, out_folder, prob_thresh=0.3, n
     adata = sq.read.visium(spaceranger_path)
     img = tf.imread(img_path)
     sample_name_id = list(adata.uns['spatial'].keys())[0]
-    spot_radius = adata.uns['spatial'][sample_name_id]['scalefactors']['spot_diameter_fullres']//2
-    yxs = adata.obsm['spatial']
     
     
-    assert np.max(yxs[:,0])<img.shape[1] and np.max(yxs[:,1])<img.shape[0], 'Visium spot positions are out of the image - please check paths for spaceranger outputs and corresponding image'    
+    
+      
     
     
-    label_fluo, poly_fluo = segmentation(img, prob_thresh, nms_thresh, pmin, pmax)
-    #tf.imwrite(out_folder + '/img_label_' + str(i) +'.tif', label_fluo) 
+    label_fluo, poly_fluo, normalised_img = segmentation(img, prob_thresh, nms_thresh, pmin, pmax)
+    if save_segm_polygons:
+        save_segmentation_polygons_to_json(poly_fluo, sample_name, out_folder)
     
+    if save_normalised_img:
+        #save_norm_image_as_compr_npy(normalised_img, sample_name, out_folder)
+        save_norm_image_as_compr_tif(normalised_img, sample_name, out_folder)
     
-    #print('yxs')
-    mask_img = (img[:,:,0] > background_thresh) & (img[:,:,2] > background_thresh)
-    #print('mask_img')
-    metrics = []
-    for j, yx in enumerate(yxs):  
-        n_cell, occupancy, R, G, B, area, elongation, segm_prob, occupancy_tissue = one_visium_spot_analysis(yx,  spot_radius, label_fluo, poly_fluo, mask_img, img)
-        #print([yx[0], yx[1], n_cell, occupancy, R, G, B, area, segm_prob, elongation, occupancy_tissue])
-        metrics.append([yx[0], yx[1], n_cell, occupancy, R, G, B, area, segm_prob, elongation, occupancy_tissue])
+    if save_csv or save_h5ad:
+        metrics_df = save_segmentation_features(adata, sample_name, img, background_thresh, label_fluo, poly_fluo, scale_factor)
+        #save results
+        if save_csv:
+            full_path_csv = out_folder + '/' + sample_name + '.csv'
+            metrics_df.to_csv(full_path_csv)
 
-    metrics_df = pd.DataFrame(metrics, columns=['y', 'x', 'n_cell', 'occupancy', 'R', 'G', 'B', 'area_cell_px', 'seg_prob', 'elongation', 'occupancy_tissue'], index=adata.obs.index)
-    
-    #save results
-    if save_csv:
-        full_path_csv = out_folder + '/' + sample_name + '.csv'
-        metrics_df.to_csv(full_path_csv)
-    
-    if save_h5ad:
-        full_path_h5ad = out_folder + '/' + sample_name + '.h5ad'
-        adata.obs = pd.concat([adata.obs, metrics_df], axis=1, ignore_index=False)
-        adata.write_h5ad(full_path_h5ad)
+        if save_h5ad:
+            full_path_h5ad = out_folder + '/' + sample_name + '.h5ad'
+            adata.obs = pd.concat([adata.obs, metrics_df], axis=1, ignore_index=False)
+            adata.write_h5ad(full_path_h5ad)
         
          
 if __name__ == "__main__":
